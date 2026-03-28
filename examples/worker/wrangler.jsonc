@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "attend-vip-email",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "send_email": [
+    { "name": "EMAIL" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "attend-vip-emails",
+      "database_id": "8762c8b2-8778-4182-90b2-be8c8204e2a9"
+    }
+  ]
+}

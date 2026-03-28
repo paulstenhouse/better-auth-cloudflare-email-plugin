@@ -4,11 +4,11 @@
  * Two transports, one interface:
  *
  *   // Inside a Cloudflare Worker — uses the send_email binding (zero latency, no API key)
- *   import { cloudflareEmail } from "./cloudflare-email";
+ *   import { cloudflareEmail } from "better-auth-cloudflare-email";
  *   const email = cloudflareEmail.workers({ binding: env.EMAIL, from: "..." });
  *
  *   // Anywhere else — uses the Cloudflare REST API
- *   import { cloudflareEmail } from "./cloudflare-email";
+ *   import { cloudflareEmail } from "better-auth-cloudflare-email";
  *   const email = cloudflareEmail.api({ accountId: "...", apiToken: "...", from: "..." });
  *
  * Both return the same object shape — spread `email.config` into betterAuth()
@@ -16,32 +16,45 @@
  */
 
 // ---------------------------------------------------------------------------
-// Shared types
+// Shared types (matches Cloudflare Email Service API spec)
 // ---------------------------------------------------------------------------
+
+export type EmailAddress = string | { address: string; name: string };
 
 export interface EmailMessage {
 	to: string | string[];
-	from: string;
+	from: EmailAddress;
 	subject: string;
 	html?: string;
 	text?: string;
 	cc?: string | string[];
 	bcc?: string | string[];
-	replyTo?: string;
+	reply_to?: EmailAddress;
 	headers?: Record<string, string>;
 	attachments?: EmailAttachment[];
 }
 
-export interface EmailAttachment {
+export type EmailAttachment = InlineAttachment | StandardAttachment;
+
+export interface InlineAttachment {
 	filename: string;
 	content: string; // base64
-	contentType: string;
-	disposition: "attachment" | "inline";
-	contentId?: string;
+	type: string; // MIME type
+	disposition: "inline";
+	content_id: string; // referenced in HTML via cid:
+}
+
+export interface StandardAttachment {
+	filename: string;
+	content: string; // base64
+	type: string; // MIME type
+	disposition: "attachment";
 }
 
 export interface EmailSendResult {
-	messageId: string;
+	delivered: string[];
+	permanent_bounces: string[];
+	queued: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -81,8 +94,8 @@ export interface Templates {
 // ---------------------------------------------------------------------------
 
 interface SharedOptions {
-	/** Default "from" address, e.g. "MyApp <noreply@myapp.com>". */
-	from: string;
+	/** Default "from" address. String or { address, name }. */
+	from: EmailAddress;
 
 	/** Application name shown in email templates. Default: "Our App". */
 	appName?: string;
@@ -98,7 +111,7 @@ interface SharedOptions {
 /** Cloudflare Workers send_email binding. */
 export interface EmailBinding {
 	send(message: EmailMessage): Promise<EmailSendResult>;
-	sendBatch?(messages: EmailMessage[]): Promise<{ results: Array<{ success: boolean; messageId?: string; error?: string }> }>;
+	sendBatch?(messages: EmailMessage[]): Promise<{ results: Array<{ success: boolean; error?: string } & Partial<EmailSendResult>> }>;
 }
 
 export interface WorkersOptions extends SharedOptions {
@@ -258,8 +271,18 @@ function createApiTransport(opts: ApiOptions): EmailTransport {
 				throw new Error(`Cloudflare Email API error (${res.status}): ${body}`);
 			}
 
-			const json = (await res.json()) as { result?: { messageId?: string } };
-			return { messageId: json.result?.messageId ?? "" };
+			const json = (await res.json()) as {
+				success: boolean;
+				result?: EmailSendResult;
+				errors?: Array<{ code: number; message: string }>;
+			};
+
+			if (!json.success) {
+				const msg = json.errors?.map((e) => e.message).join(", ") ?? "Unknown error";
+				throw new Error(`Cloudflare Email API error: ${msg}`);
+			}
+
+			return json.result ?? { delivered: [], permanent_bounces: [], queued: [] };
 		},
 	};
 }

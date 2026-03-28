@@ -1,6 +1,6 @@
 {
   "name": "better-auth-cloudflare-email",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Send emails through Cloudflare Email Service from Better Auth — Workers binding and REST API transports",
   "license": "MIT",
   "author": "Paul Stenhouse",

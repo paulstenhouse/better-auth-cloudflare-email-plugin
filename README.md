@@ -130,7 +130,7 @@ import { betterAuth } from "better-auth";
 import { cloudflareEmail } from "better-auth-cloudflare-email";
 
 interface Env {
-  EMAIL: import("./auth/cloudflare-email").EmailBinding;
+  EMAIL: import("better-auth-cloudflare-email").EmailBinding;
   DB: D1Database;
 }
 
@@ -214,7 +214,7 @@ await email.sendRaw({
   attachments: [{
     filename: "invoice.pdf",
     content: base64String,
-    contentType: "application/pdf",
+    type: "application/pdf",
     disposition: "attachment",
   }],
 });
