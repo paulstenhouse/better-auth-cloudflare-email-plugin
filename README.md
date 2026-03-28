@@ -22,7 +22,9 @@ Both wire into all 6 Better Auth email callbacks automatically and ship with cle
 
 ## Install
 
-Copy `src/auth/cloudflare-email.ts` into your project. No npm package (yet) — it's a single file with zero dependencies.
+```bash
+npm install better-auth-cloudflare-email
+```
 
 ## Quick start
 
@@ -31,7 +33,7 @@ Copy `src/auth/cloudflare-email.ts` into your project. No npm package (yet) — 
 ```ts
 import { betterAuth } from "better-auth";
 import { magicLink, emailOTP } from "better-auth/plugins";
-import { cloudflareEmail } from "./auth/cloudflare-email";
+import { cloudflareEmail } from "better-auth-cloudflare-email";
 
 function createAuth(env: Env) {
   const email = cloudflareEmail.workers({
@@ -63,7 +65,7 @@ Add the binding to your `wrangler.jsonc`:
 ```ts
 import { betterAuth } from "better-auth";
 import { magicLink, emailOTP } from "better-auth/plugins";
-import { cloudflareEmail } from "./auth/cloudflare-email";
+import { cloudflareEmail } from "better-auth-cloudflare-email";
 
 const email = cloudflareEmail.api({
   accountId: process.env.CF_ACCOUNT_ID!,
@@ -125,7 +127,7 @@ export const auth = betterAuth({
 ```ts
 import { Hono } from "hono";
 import { betterAuth } from "better-auth";
-import { cloudflareEmail } from "./auth/cloudflare-email";
+import { cloudflareEmail } from "better-auth-cloudflare-email";
 
 interface Env {
   EMAIL: import("./auth/cloudflare-email").EmailBinding;
@@ -157,7 +159,7 @@ If you don't want to create auth per-request, pass a function that resolves the 
 
 ```ts
 import { getRequestContext } from "@cloudflare/next-on-pages";
-import { cloudflareEmail } from "./auth/cloudflare-email";
+import { cloudflareEmail } from "better-auth-cloudflare-email";
 
 const email = cloudflareEmail.workers({
   binding: () => getRequestContext().env.EMAIL,

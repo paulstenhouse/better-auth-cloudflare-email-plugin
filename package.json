@@ -1,0 +1,52 @@
+{
+  "name": "better-auth-cloudflare-email",
+  "version": "0.1.0",
+  "description": "Send emails through Cloudflare Email Service from Better Auth — Workers binding and REST API transports",
+  "license": "MIT",
+  "author": "Paul Stenhouse",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulstenhouse/better-auth-cloudflare-email-plugin"
+  },
+  "keywords": [
+    "better-auth",
+    "cloudflare",
+    "email",
+    "cloudflare-workers",
+    "cloudflare-email",
+    "authentication",
+    "transactional-email"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "better-auth": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "better-auth": {
+      "optional": true
+    }
+  }
+}
