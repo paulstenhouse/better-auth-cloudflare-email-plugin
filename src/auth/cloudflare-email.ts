@@ -253,7 +253,7 @@ function createWorkersTransport(opts: WorkersOptions): EmailTransport {
 
 function createApiTransport(opts: ApiOptions): EmailTransport {
 	const baseUrl = opts.baseUrl ?? "https://api.cloudflare.com/client/v4";
-	const url = `${baseUrl}/accounts/${opts.accountId}/email-service/send`;
+	const url = `${baseUrl}/accounts/${opts.accountId}/email/sending/send`;
 
 	return {
 		async send(message) {
